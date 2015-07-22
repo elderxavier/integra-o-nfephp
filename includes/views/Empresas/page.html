@@ -1,0 +1,169 @@
+<div id="div-cadempresa-id" class="div-cadempresa-class">
+	<form id="form-cadempresa-id"  class="form-cadempresa-class" action="javascript:void(0)" >  
+		
+		<!--DADOS DO EMITENTE -->
+		<div class="emitente">           
+            <div class="span">
+                <label>CNPJ</label>
+                <input type="text" name="CNPJ" id="CNPJ" required="" size="14" class="cnpj" >
+            </div>
+            <div class="span">
+                <label>Razão Social</label>
+                <input type="text" name="xNome" id="xNome" required="" size="50">
+            </div>
+            <div class="span">
+                <label>Nome Fantasia</label>
+                <input type="text" name="xFant" id="xFant" size="50">
+            </div>
+            <div class="span">
+                <label>Inscrição Estadual</label>
+                <input type="text" name="IE" id="IE" size="14">
+            </div>
+            <div class="span">
+                <label>IE do Substituto tributario (se houver)</label>
+                <input type="text" name="IEST" id="IEST" size="14">
+            </div>
+            <div class="span">
+                <label>Inscrição Municipal</label>
+                <input type="text" name="IM" id="IM" size="14">
+            </div>
+            <div class="span">
+                <label>CNAE Fiscal</label>
+                <input type="text" name="CNAE" id="CNAE" size="14">
+            </div>
+            <div class="span">
+                <label>Código de Regime Tributário</label>                
+                <select name="CRT" id="CRT" class="CRT">
+                    <option value=""> Selecione </option>
+                    <option value="1">1 - Simples Nacional</option>
+                    <option value="2">2 - Simples Nacional - excesso de sublimite da receita bruta</option>
+                    <option value="3">3 - Regime Normal</option>                    
+               </select>
+            </div>          
+        </div>    	
+        <!--FIM DADOS DO EMITENTE -->
+        <!--ENDERECO DO EMITENTE -->
+
+        <div class="end-emitente"> 
+        	<div class="span">
+                <label>CEP</label>
+                <input type="text" name="CEP" id="CEP" size="8">
+                <a href="http://www.buscacep.correios.com.br"  target="_blank"> Duvida, clique aqui</a>
+            </div>
+        
+            <div class="span">
+                <label>Logradouro</label>
+                <input type="text" name="xLgr" id="xLgr" size="50">
+            </div>
+            <div class="span">
+                <label>Número</label>
+                <input type="text" name="nro" id="nro" size="10">
+            </div>      
+            <div class="span">
+                <label>Complemento</label>
+                <input type="text" name="xCpl" id="nro" size="30">
+            </div>  
+            <div class="span">
+                <label>Bairro</label>
+                <input type="text" name="xBairro" id="xBairro" size="50">
+            </div>  
+            <div class="span">
+                <label>Município</label>
+                <input type="text" name="xMun" id="xMun" size="50">
+            </div>
+            <div class="span">
+                <label>Código do Município</label>
+                <input type="text" name="cMun" id="cMun" size="7">
+                <a href="http://www.cidades.ibge.gov.br/xtras/home.php"  target="_blank"> Duvida, clique aqui</a>
+            </div>
+            <div class="span" id="uf">
+                <label>UF</label>                
+                <select name="cUF" id="cUF" class="UF">
+                    <option value=""> Selecione </option>
+                    <option value="12">AC</option>
+                    <option value="27">AL</option>
+                    <option value="13">AM</option>
+                    <option value="16">AP</option>
+                    <option value="29">BA</option>
+                    <option value="23">CE</option>
+                    <option value="53">DF</option>
+                    <option value="32">ES</option>                  
+                    <option value="52">GO</option>
+                    <option value="21">MA</option>
+                    <option value="31">MG</option>
+                    <option value="50">MS</option>
+                    <option value="51">MT</option>
+                    <option value="15">PA</option>
+                    <option value="25">PB</option>
+                    <option value="26">PE</option>
+                    <option value="22">PI</option>
+                    <option value="41">PR</option>
+                    <option value="33">RJ</option>
+                    <option value="24">RN</option>
+                    <option value="14">RO</option>
+                    <option value="11">RR</option>
+                    <option value="43">RS</option>
+                    <option value="42">SC</option>
+                    <option value="29">SE</option>
+                    <option value="35">SP</option>
+                    <option value="17">TO</option>
+               </select>
+            </div>             
+            <div class="span">
+                <label>País</label>                
+                <select name="xPais" id="xPais" class="UF">                    
+                    <option value="Brasil">Brasil</option>                    
+                </select>
+            </div> 
+            <div class="span">
+                <label>Código do País</label>                
+                <select name="cPais" id="cPais" class="UF">                    
+                    <option value="1058">1058</option>                    
+               </select>
+            </div>
+            <div class="span">
+                <label>Telefone (apenas DDD e números)</label>
+                <input type="text" name="fone" id="fone" size="10">                
+            </div>             
+        </div>	
+
+        <!--FIM ENDERECO DO EMITENTE -->
+
+	</form>
+</div>
+
+<script type="text/javascript" >
+	jQuery('#CEP').change(function() {           
+       loadCepEmitente(jQuery(this).val());       
+    });
+    function loadCepEmitente(cep){
+    var xmlhttp;     
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+      }      
+    else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+      }
+    xmlhttp.onreadystatechange=function(){
+      if (xmlhttp.readyState==4 && xmlhttp.status==200){        
+        var json = JSON.parse(xmlhttp.responseText);        
+        document.getElementById("xLgr").value = json.logradouro;        
+        document.getElementById("xBairro").value = json.bairro;
+        document.getElementById("xMun").value = json.localidade;
+        //document.getElementById("xLgr").value = json.uf;
+        document.getElementById("cMun").value = json.ibge;
+        var index = 0;
+        for(var i=0; i<document.getElementById("cUF").length; i++){
+            if(document.getElementById("cUF")[i].text == json.uf){                                
+                document.getElementById("cUF").selectedIndex = i;
+                break;                
+            }
+
+        }
+    }
+  }
+    xmlhttp.open("GET","http://viacep.com.br/ws/"+cep+"/json/",true);
+    xmlhttp.send();    
+}
+	
+</script>
