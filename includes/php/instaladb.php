@@ -3,10 +3,9 @@ require_once('conexao.php');
 require_once('crialog.php');
 class InstalaDB { 
 
-	private function __construct() { 
+	/*private function __construct() { // 
 	
-	
-	}
+	}*/
 	/* tabela nfe_emissor*/
 	public function criaTabelaEmissor() {
 		try {
@@ -14,7 +13,7 @@ class InstalaDB {
 		  `id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
 		  `CNPJ` varchar(14) NOT NULL DEFAULT '' COMMENT 'número do CNPJ da empresa emissora',
 		  `xNome` varchar(60) NOT NULL DEFAULT '' COMMENT 'nome da empresa emissora',		  
-		  `xFant` varchar(60)  '' COMMENT 'nome fantasia da empresa emissora',
+		  `xFant` varchar(60)  DEFAULT '' COMMENT 'nome fantasia da empresa emissora',
 		  `xLgr` varchar(60) NOT NULL DEFAULT '' COMMENT 'logradouro da empresa emissora',		  
 		  `nro` varchar(60) NOT NULL DEFAULT '' COMMENT 'número da empresa emissora',
 		  `xCpl` varchar(60)  DEFAULT '' COMMENT 'complemento do endereco da empresa emissora',
@@ -39,8 +38,6 @@ class InstalaDB {
 		}catch (Exception $e) {
 			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
 			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
-		}finally {
-			$p_sql = null;
 		}
 	}
 	/* tabela nfe_destinatario*/
@@ -102,8 +99,6 @@ class InstalaDB {
 		}catch (Exception $e) {
 			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
 			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
-		}finally {
-			$p_sql = null;
 		}
 	}
 
@@ -197,8 +192,8 @@ class InstalaDB {
 				`nRE` varchar(12) DEFAULT '' COMMENT 'Número do Registro de Exportação.',
 				`chNFe` varchar(44) DEFAULT '' COMMENT 'Chave de Acesso da NF-e recebida para exportação.',
 				`qExport` varchar(15) DEFAULT '' COMMENT 'Quantidade do item realmente exportado.',	
-				CONSTRAINT fk_pedido FOREIGN KEY (pedido),
-				REFERENCES nfe_pedido(pedido),			
+				CONSTRAINT fk_pedido FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
 				PRIMARY KEY (`id`)		  
 				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Dados dos itens NF-e';";
 
@@ -208,11 +203,11 @@ class InstalaDB {
 		}catch (Exception $e) {
 			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
 			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
-		}finally {
-			$p_sql = null;
-		}	
+		}
+	}
 
-} 
+}
+
 ?>
 
 

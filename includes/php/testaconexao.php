@@ -1,6 +1,11 @@
 <?php 
-require_once('conexao.php');
-
+//require_once('conexao.php');
+require_once('instaladb.php');
+$criadbs = new InstalaDB();
+$criadbs->criaTabelaEmissor();
+$criadbs->criaTabelaPedido();
+$criadbs->criaTabelaItens();
+/*
 	try { 	
 		$p_sql = Conexao::getInstance();
 		echo "Conectado ao Banco de dados";
@@ -13,6 +18,6 @@ require_once('conexao.php');
 			echo "Banco de dados banco de dados desconectado";
 	}
 
-
+*/
 
 ?>

@@ -19,7 +19,8 @@ class CriaLog {
 		$arquivo = "Logger_$data.txt";
 		 
 		//Texto a ser impresso no log:
-		$texto = "[$hora][$ip]> $msg \n";
+		//.debug_backtrace().
+		$texto = "[$hora] > $msg \n";
 		 
 		$manipular = fopen("$arquivo", "a+b");
 		fwrite($manipular, $texto);
