@@ -30,8 +30,9 @@ class InstalaDB {
 		  `IM` varchar(15)  DEFAULT '' COMMENT 'Inscrição Municipal do Prestador de Serviço  da empresa emissora',
 		  `CNAE` varchar(7)  DEFAULT '' COMMENT 'CNAE fiscal',
 		  `CRT` varchar(1)  DEFAULT '' COMMENT 'Código de Regime Tributário da empresa emissora',
+		  UNIQUE (`CNPJ`),
 		  PRIMARY KEY (`id`)		  
-		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='dados do emitente da NF-e';";
+		) ENGINE=InnoDB  DEFAULT AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e';";
 
 		$p_sql = Conexao::getInstance()->prepare($sqlstring);
 		$p_sql->execute();
@@ -46,6 +47,7 @@ class InstalaDB {
 		$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_pedido` (
 		  `id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
 		  `pedido` varchar(14) NOT NULL  COMMENT 'Número do pedido.',
+		  `emitente_cnpj` varchar(3) NOT NULL  DEFAULT '' COMMENT 'CNPJ do emitente do pedido.',
 		  `CNPJ` varchar(14) NOT NULL DEFAULT '' COMMENT 'número do CNPJ do destinátario',
 		  `CPF` varchar(11) NOT NULL DEFAULT '' COMMENT 'número do CPF do destinátario',
 		  `idEstrangeiro` varchar(20) NOT NULL DEFAULT '' COMMENT 'dentificação do destinatário no caso de comprador estrangeiro',
@@ -89,10 +91,11 @@ class InstalaDB {
 		  `entrega_xMun` varchar(60)  DEFAULT '' COMMENT 'Nome do municipio do local de entrega',
 		  `entrega_UF` varchar(2)  DEFAULT '' COMMENT 'sigla UF do local de entrega',
 		  `total_itens` varchar(3)  DEFAULT '' COMMENT 'total de itens do pedido',
-
+		  	CONSTRAINT fk_emitente_cnpj FOREIGN KEY (`emitente_cnpj`)
+			REFERENCES nfe_emissor(`CNPJ`),
 		  UNIQUE (`pedido`),
 		  PRIMARY KEY (`id`)		  
-		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Dados do destinatario da NF-e';";
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados do destinatario da NF-e';";
 
 		$p_sql = Conexao::getInstance()->prepare($sqlstring);
 		$p_sql->execute();
@@ -108,7 +111,7 @@ class InstalaDB {
 			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_itens` (
 				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
 				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',				
-				`nItem` varchar(3) NOT NULL  DEFAULT '' COMMENT 'Número do item - de 1 até 990 por NF-e.',
+				`nItem` varchar(3) NOT NULL  DEFAULT '' COMMENT 'Número do item - de 1 até 990 por NF-e.',				
 				/*<det nItem=nItem><prod>*/
 				`cProd` varchar(60) NOT NULL  DEFAULT '' COMMENT 'código  do produto.',
 				`cEAN` varchar(14) NOT NULL  DEFAULT '' COMMENT 'código  de barras.',
@@ -195,7 +198,7 @@ class InstalaDB {
 				CONSTRAINT fk_pedido FOREIGN KEY (`pedido`)
 				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
 				PRIMARY KEY (`id`)		  
-				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Dados dos itens NF-e';";
+				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
 
 			$p_sql = Conexao::getInstance()->prepare($sqlstring);
 			$p_sql->execute();
@@ -206,8 +209,72 @@ class InstalaDB {
 		}
 	}
 
+	public function criaTabelaTotalImpostos() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_totalimpostos` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*Total de impostos <total>*/
+				/*Total de ICMS <ICMSTot>*/
+				`ICMSTot` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'usar ICMSTot, 1=verdadeiro.',
+				`ICMSTot_vBC` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Base de Cálculo do ICMS.',
+				`ICMSTot_vICMS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do ICMS.',
+				`ICMSTot_vICMSDeson` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do ICMS desonerado.',
+				`ICMSTot_vBCST` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Base de Cálculo do ICMS ST.',
+				`ICMSTot_vST` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do ICMS ST.',
+				`ICMSTot_vProd` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total dos produtos e serviço.',
+				`ICMSTot_vFrete` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do frete.',
+				`ICMSTot_vSeg` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do seguro.',
+				`ICMSTot_vDesc` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do desconto.',
+				`ICMSTot_vII` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do II.',
+				`ICMSTot_vIPI` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do IPI.',
+				`ICMSTot_vPIS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total do PIS.',
+				`ICMSTot_vCOFINS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor da COFINS.',
+				`ICMSTot_vOutro` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Outras Despesas acessórias.',
+				`ICMSTot_vNF` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Total da NF-e.',
+				`ICMSTot_vTotTrib` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor aproximado total de tributos.',
+				/*</ICMSTot>*/
+				/* Total de ISSQN (nao utilizar)<ISSQNtot>*/
+				`ISSQNtot` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'usar ISSQNtot, 1=verdadeiro.',				
+				`ISSQN_vServ` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total dos Serviços sob não-incidência ou não tributados pelo ICMS.',
+				`ISSQN_vBC` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total Base de Cálculo do ISS.',
+				`ISSQN_vISS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total do ISS.',
+				`ISSQN_vPIS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total do PIS sobre serviços.',
+				`ISSQN_vCOFINS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total da COFINS sobre serviços.',
+				`ISSQN_dCompet` varchar(8)  DEFAULT '0.00' COMMENT 'Data da prestação do serviço AAAA-MM-DD sem caracteres especiais.',
+				`ISSQN_vDeducao` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total dedução para redução da Base de Cálculo.',
+				`ISSQN_vOutro` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total outras retenções.',
+				`ISSQN_vDescIncond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto incondicionado.',
+				`ISSQN_vDescCond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto condicionado.',
+				`ISSQN_vDescCond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto condicionado.',
+				`ISSQN_vISSRet` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total retenção ISS.',
+				`ISSQN_cRegTrib` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Código do Regime Especial de Tributação.',
+				/*</ISSQNtot>*/
+				/*Retenções de Tributos <retTrib>*/
+				`retTrib` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'usar retTrib, 1=verdadeiro.',
+				`retTrib_vRetPIS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Retido de PIS.',
+				`retTrib_vRetCOFINS` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Retido de COFINS.',
+				`retTrib_vRetCSLL` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Retido de CSLL.',
+				`retTrib_vBCIRRF` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Base de Cálculo do IRRF.',
+				`retTrib_vBCRetPrev` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Base de Cálculo da Retenção da Previdência Social.',
+				`retTrib_vRetPrev` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor da Retenção da Previdência Social.',
+				/*</retTrib>*/
+				/*</total>*/
+				CONSTRAINT fk_pedido FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}		
 }
 
 ?>
+
+
 
 
