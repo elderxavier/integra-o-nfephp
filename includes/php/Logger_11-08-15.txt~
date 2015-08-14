@@ -1,0 +1,36 @@
+[23:22:44] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e'' at line 24 
+[23:22:44] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:44] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:44] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'ISSQN_vDescCond' 
+[23:22:44] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:45] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:45] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:45] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB/TEXT column 'infAdFisco' can't have a default value 
+[23:22:45] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:45] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:22:45] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'qTotGer' 
+[23:22:46] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:16] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e'' at line 24 
+[23:29:16] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:16] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:16] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'ISSQN_vDescCond' 
+[23:29:17] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:17] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:17] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:17] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB/TEXT column 'infAdFisco' can't have a default value 
+[23:29:18] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:18] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:29:18] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'qTotGer' 
+[23:29:18] > Erro: Código: HY000 Mensagem: SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint 
+[23:32:20] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e'' at line 24 
+[23:42:41] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'ISSQN_vDescCond' 
+[23:42:42] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_transporte' 
+[23:42:42] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_cobranca' 
+[23:42:42] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_pagamento' 
+[23:42:42] > Erro: Código: 42000 Mensagem: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB/TEXT column 'infAdFisco' can't have a default value 
+[23:42:42] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_comercioexterior' 
+[23:42:43] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_compras' 
+[23:42:43] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'qTotGer' 
+[23:42:43] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_assinaturadigital' 
+[23:45:17] > Erro: Código: 42S21 Mensagem: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'ISSQN_vDescCond' 
+[23:46:03] > Erro: Código: 23000 Mensagem: SQLSTATE[23000]: Integrity constraint violation: 1022 Can't write; duplicate key in table 'nfe_totalimpostos' 

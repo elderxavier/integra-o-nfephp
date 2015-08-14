@@ -9,10 +9,10 @@ class Conexao {
 	}
 
 	public static function getInstance() {		
-		$host = 'ip_conexao';
-		$dbname = 'nome_do_banco_de_dados';
-	 	$user = 'usuario';	 	
-	 	$psw = 'senha';
+		$host = 'localhost';
+		$dbname = 'nfe';
+	 	$user = 'root';	 	
+	 	$psw = '';
 		 if (!isset(self::$instance)) { 
 		 	self::$instance = new PDO('mysql:host='.$host.';dbname='.$dbname, $user,$psw, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")); 
 		 	self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 

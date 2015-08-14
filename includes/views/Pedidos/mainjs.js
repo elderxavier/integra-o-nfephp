@@ -1,4 +1,4 @@
-<script type="text/javascript" >
+
 jQuery('#submit-form-id').click(function(){
   jQuery('#form-cadpedido-id').attr('action','salvar_pedido');
   jQuery('#form-cadpedido-id').submit();
@@ -63,4 +63,3 @@ function loadCepDestinatario(cep){
     xmlhttp.send();    
 }
 
-</script>

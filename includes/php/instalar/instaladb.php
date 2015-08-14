@@ -1,5 +1,5 @@
 <?php 
-require_once('conexao.php');
+require_once('conexao/conexao.php');
 require_once('crialog.php');
 class InstalaDB { 
 
@@ -32,7 +32,7 @@ class InstalaDB {
 		  `CRT` varchar(1)  DEFAULT '' COMMENT 'Código de Regime Tributário da empresa emissora',
 		  UNIQUE (`CNPJ`),
 		  PRIMARY KEY (`id`)		  
-		) ENGINE=InnoDB  DEFAULT AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e';";
+		) ENGINE=InnoDB AUTO_INCREMENT=1 CHARSET=utf8 COMMENT='dados do emitente da NF-e';";
 
 		$p_sql = Conexao::getInstance()->prepare($sqlstring);
 		$p_sql->execute();
@@ -95,7 +95,7 @@ class InstalaDB {
 			REFERENCES nfe_emissor(`CNPJ`),
 		  UNIQUE (`pedido`),
 		  PRIMARY KEY (`id`)		  
-		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados do destinatario da NF-e';";
+		) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados do destinatario da NF-e';";
 
 		$p_sql = Conexao::getInstance()->prepare($sqlstring);
 		$p_sql->execute();
@@ -129,6 +129,7 @@ class InstalaDB {
 				/*Dados do pedido - não obrigatorio mais recomendado*/
 				`indTot` varchar(1)  DEFAULT '1' COMMENT 'Indica se valor do Item (vProd) entra no valor total da NF-e (vProd) 1=entra 0= não entra.',
 				`nItemPed` varchar(6)  DEFAULT '1' COMMENT 'Item do Pedido de Compra.',
+				
 				/*</*prod>/
 				/*IMPOSTOS <imposto>*/
 				`vTotTrib` varchar(15)  COMMENT 'Valor aproximado total de tributos federais, estaduais e municipais.',
@@ -195,10 +196,11 @@ class InstalaDB {
 				`nRE` varchar(12) DEFAULT '' COMMENT 'Número do Registro de Exportação.',
 				`chNFe` varchar(44) DEFAULT '' COMMENT 'Chave de Acesso da NF-e recebida para exportação.',
 				`qExport` varchar(15) DEFAULT '' COMMENT 'Quantidade do item realmente exportado.',	
+				/**/
 				CONSTRAINT fk_pedido FOREIGN KEY (`pedido`)
 				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
 				PRIMARY KEY (`id`)		  
-				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
 
 			$p_sql = Conexao::getInstance()->prepare($sqlstring);
 			$p_sql->execute();
@@ -244,8 +246,7 @@ class InstalaDB {
 				`ISSQN_dCompet` varchar(8)  DEFAULT '0.00' COMMENT 'Data da prestação do serviço AAAA-MM-DD sem caracteres especiais.',
 				`ISSQN_vDeducao` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total dedução para redução da Base de Cálculo.',
 				`ISSQN_vOutro` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total outras retenções.',
-				`ISSQN_vDescIncond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto incondicionado.',
-				`ISSQN_vDescCond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto condicionado.',
+				`ISSQN_vDescIncond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto incondicionado.',				
 				`ISSQN_vDescCond` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total desconto condicionado.',
 				`ISSQN_vISSRet` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor total retenção ISS.',
 				`ISSQN_cRegTrib` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Código do Regime Especial de Tributação.',
@@ -260,10 +261,10 @@ class InstalaDB {
 				`retTrib_vRetPrev` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor da Retenção da Previdência Social.',
 				/*</retTrib>*/
 				/*</total>*/
-				CONSTRAINT fk_pedido FOREIGN KEY (`pedido`)
+				CONSTRAINT fk_pedido_totalimpostos FOREIGN KEY (`pedido`)
 				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
 				PRIMARY KEY (`id`)		  
-				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
+				) ENGINE=InnoDB  CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens NF-e';";
 			$p_sql = Conexao::getInstance()->prepare($sqlstring);
 			$p_sql->execute();
 
@@ -271,7 +272,307 @@ class InstalaDB {
 			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
 			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
 		}		
+	}
+
+	
+	public function criaTabelaTransporte() {
+			try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_transporte` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*<transp> Grupo Informações do Transporte */
+				`modFrete` varchar(1) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*<transporta> Grupo Transportador*/
+				`transporta` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo transporta, 1=verdadeiro.',
+				`CNPJ` varchar(14) DEFAULT '' COMMENT 'CNPJ do Transportador.',
+				`CPF` varchar(11)  DEFAULT '' COMMENT 'CPF do Transportador.',
+				`xNome` varchar(60)  DEFAULT '' COMMENT 'Nome ou razão social do Transportador.',
+				`IE` varchar(60)  DEFAULT '' COMMENT 'Inscrição estadual do Transportador.',	
+				`xEnder` varchar(60)  DEFAULT '' COMMENT 'Endereço do Transportador.',	
+				`xMun` varchar(60)  DEFAULT '' COMMENT 'Nome do município do Transportador.',
+				`UF` varchar(2)  DEFAULT '' COMMENT 'Sigla UF do Transportador.',
+				/*</transporta>*/
+				/*<retTransp> Grupo Retenção ICMS transporte */
+				`vServ` varchar(15)  DEFAULT '0.00' COMMENT 'Valor do Serviço do Transportador.',	
+				`vBCRet` varchar(15)  DEFAULT '0.00' COMMENT 'BC da Retenção do ICMS.',	
+				`pICMSRet` varchar(7)  DEFAULT '0.00' COMMENT 'Alíquota da Retenção.',	
+				`vICMSRet` varchar(15)  DEFAULT '0.00' COMMENT 'Valor do ICMS Retido.',	
+				`CFOP` varchar(15)  DEFAULT '0.00' COMMENT 'CFOP.',	
+				`cMunFG` varchar(7)  DEFAULT '0.00' COMMENT 'Código do município de ocorrência do fato gerador do ICMS do transporte.',
+				/*</retTransp>
+				/*Sequência XML*/
+				/*<veicTransp> Grupo Veículo Transporte*/				
+				`veicTransp` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo veicTransp, 1=verdadeiro.',
+				`veicTransp_placa` varchar(7)  DEFAULT '' COMMENT 'Placa do veículo.',
+				`veicTransp_UF` varchar(2) DEFAULT '' COMMENT 'Sigla UF.',	
+				`veicTransp_RNTC` varchar(20) DEFAULT '' COMMENT 'Registro Nacional de Transportador de Carga (ANTT).',
+				/*</veicTransp> */
+				/*<reboque> Grupo Reboque*/
+				`reboque` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo reboque, 1=verdadeiro.',				
+				`reboque_placa` varchar(7)  DEFAULT '' COMMENT 'Placa do veículo.',
+				`reboque_UF` varchar(2) DEFAULT '' COMMENT 'Sigla UF.',	
+				`reboque_RNTC` varchar(20) DEFAULT '' COMMENT 'Registro Nacional de Transportador de Carga (ANTT).',
+				`reboque_vagao` varchar(20) DEFAULT '' COMMENT 'Identificação do vagão.',
+				`reboque_balsa` varchar(20) DEFAULT '' COMMENT 'Identificação da balsa.',
+				/*</reboque>*/
+				/*<vol> Grupo Volumes*/
+				`vol` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo volume, 1=verdadeiro.',
+				`qVol` varchar(15) DEFAULT '' COMMENT 'Quantidade de volumes transportados.',
+				`esp` varchar(60)  DEFAULT '' COMMENT 'Espécie dos volumes transportados.',
+				`marca` varchar(60) DEFAULT '' COMMENT 'Marca dos volumes transportados.',
+				`nVol` varchar(60)  DEFAULT '' COMMENT 'Numeração dos volumes transportados.',
+				`pesoL` varchar(60) DEFAULT '' COMMENT 'Peso Líquido (em kg).',
+				`pesoB` varchar(60) DEFAULT '' COMMENT 'Peso Bruto (em kg).',
+				/*</vol>*/
+				/*<lacres> Grupo de lacres*/
+				`lacres` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo lacres, 1=verdadeiro.',
+				`nLacre` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Número dos lacres.',
+				/*</lacres>*/
+				 /*</transp>*/
+				CONSTRAINT fk_pedido_transporte FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados do transporte NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+
+
+	}	
+		
+	public function criaTabelaCobranca() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_cobranca` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*Grupo Cobrança <cobr>*/
+				`cobr` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo cobrança, 1=verdadeiro.',
+				/*Grupo fatura <fat>*/
+				`fat` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo fatura, 1=verdadeiro.',
+				`nFat` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Número da Fatura.',
+				`vOrig` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Número da Fatura.',
+				`vDesc` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor do desconto.',
+				`vLiq` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor Líquido da Fatura.',
+				/*</fat>*/
+				/*Grupo Duplicata <dup>*/
+				`dup` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo cobrança, 1=verdadeiro.',
+				`nDup` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Número da Duplicata.',
+				`dVenc` varchar(10) NOT NULL  DEFAULT '2015-07-23' COMMENT 'Data de vencimento Formato:AAAA-MM-DD.',
+				`vDup` varchar(15) NOT NULL  DEFAULT '0.00' COMMENT 'Valor da duplicata.',
+				/*</dup>*/
+				/*</cobr>*/
+				CONSTRAINT fk_pedido_cobranca FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados da cobrança da  NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}			
+
+	public function criaTabelaPagamento() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_pagamento` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*Grupo de Formas de Pagamento <pag>*/
+				`pag` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo de Formas de Pagamento, 1=verdadeiro.',
+				`tPag` varchar(2) NOT NULL  DEFAULT '0' COMMENT 'Forma de pagamento',
+				`vPag` varchar(15) NOT NULL  DEFAULT '0' COMMENT 'Valor do pagamento',
+				/*Grupo de Cartões <card>*/
+				`card` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo de Cartões, 1=verdadeiro se tPag=03 ou 04.',
+				`CNPJ` varchar(14) NOT NULL  DEFAULT '' COMMENT 'CNPJ da Credenciadora de cartão de crédito e/ou débito Bandeira da operad.',
+				`tBand` varchar(2) NOT NULL  DEFAULT '' COMMENT 'Bandeira da operadora de cartão de crédito e/ou débito 01=Visa 02=Mastercard.',
+				`cAut` varchar(20) NOT NULL  DEFAULT '' COMMENT 'Número de autorização da operação cartão de crédito e/ou débito.',
+				/*</card>*/
+				/*</pag>*/
+				CONSTRAINT fk_pedido_pagamento FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados do pagamento NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}
+
+	public function criaTabelaInformacoesAdicionais() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_informacoesadicionais` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*Grupo de Informações Adicionais <infAdic>*/
+				`infAdic` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo de Informações Adicionais, 1=verdadeiro.',	
+				`infAdFisco` text COMMENT 'Informações Adicionais de Interesse do Fisco até 2000 caracteres.',
+				`infCpl` text COMMENT 'Informações Complementares de interesse do Contribuinte até 5000 caracteres.',
+				/*Grupo Campo de uso livre do contribuinte <obsCont>*/		
+				`obsCont` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo Campo de uso livre do contribuinte, 1=verdadeiro.',
+				`obsCont_xCampo` varchar(20) NOT NULL  DEFAULT '' COMMENT 'dentificação do campo.',
+				`obsCont_xTexto` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Conteúdo do campo.',
+				/*</obsCont>*/
+				/*Grupo Campo de uso livre do Fisco <obsFisco>*/
+				`obsFisco` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo Campo de uso livre do Fisco, 1=verdadeiro.',
+				`obsFisco_xCampo` varchar(20) NOT NULL  DEFAULT '' COMMENT 'dentificação do campo.',
+				`obsFisco_xTexto` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Conteúdo do campo.',
+				/*</obsFisco>*/
+				/*Grupo Processo referenciado<procRef>*/
+				`procRef` varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Grupo Processo referenciado, 1=verdadeiro.',
+				`nProc`varchar(60) NOT NULL  DEFAULT '0' COMMENT 'Identificador do processo ou ato concessório.',
+				`indProc`varchar(1) NOT NULL  DEFAULT '0' COMMENT 'Indicador da origem do processo.', 
+				/*</procRef>*/
+				/*</infAdic>*/
+				CONSTRAINT fk_pedido_informacoesadicionais FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Informações adcionais NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}
+
+	/*ZA. Informações de Comércio Exterior*/
+	public function criaTabelaComercioExterior() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_comercioexterior` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*Grupo Exportação  <exporta>*/
+				`exporta` varchar(1) NOT NULL  DEFAULT '1' COMMENT 'Grupo Exportação, 1=verdadeiro.',
+				`UFSaidaPais` varchar(2) NOT NULL  DEFAULT 'RS' COMMENT 'Sigla da UF de Embarque ou de transposição de fronteira.',
+				`xLocExporta` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Descrição do Local de Embarque ou de transposição de fronteira.',
+				`xLocDespacho` varchar(60) NOT NULL  DEFAULT '' COMMENT 'Descrição do local de despacho.',
+				/*</exporta>*/
+				CONSTRAINT fk_pedido_comercioexterior FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados dos itens comercializados no exterior NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}	
+
+	/*ZA. Informações de Comércio Exterior*/
+	public function criaTabelaCompras() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_compras` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*<compra> Grupo Compra*/
+				`xNEmp` varchar(22) DEFAULT '' COMMENT 'Nota de Empenho.',
+				/*xPed mesmo que pedido*/
+				`xCont` varchar(22) DEFAULT '' COMMENT 'Contrato.',
+				/*</compra>*/				
+				CONSTRAINT fk_pedido_compras FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Dados das compras itens NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}	
+
+	public function criaTabelaAquisicaodeCana() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_aquisicaodecana` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*<cana> Grupo de cana*/	
+				`safra` varchar(9) DEFAULT '' COMMENT 'Identificação da safra.',				
+				`ref` varchar(7) DEFAULT '' COMMENT 'Mês e ano de referência MM/AAAA.',
+				/*<forDia> Fornecimento diário de cana*/
+				`forDia` varchar(1) DEFAULT '0' COMMENT 'Fornecimento diário de cana, 1=verdadeiro',
+				`dia` varchar(2) DEFAULT '' COMMENT 'dia.',
+				`qtde` varchar(21) DEFAULT '' COMMENT 'Quabtidade.',
+				/*</forDia>*/
+				`qTotMes` varchar(21) DEFAULT '' COMMENT 'Quabtidade total mês.',
+				`qTotAnt` varchar(21) DEFAULT '' COMMENT 'Quabtidade total anterior.',
+				`qTotGer` varchar(21) DEFAULT '' COMMENT 'Quabtidade total geral.',				
+				/*<deduc> Grupo Deduções – Taxas e Contribuições*/				 
+				`deduc` varchar(1) DEFAULT '0' COMMENT 'Grupo Deduções – Taxas e Contribuições, 1=verdadeiro.',
+				`xDed` varchar(60) DEFAULT '' COMMENT 'Descrição da Dedução.',
+				`vDed` varchar(15) DEFAULT '0.00' COMMENT 'Valor da Dedução.',
+				`vFor` varchar(15) DEFAULT '0.00' COMMENT 'Valor dos Fornecimentos.',
+				`vTotDed` varchar(15) DEFAULT '0.00' COMMENT 'Valor Total da Dedução.',
+				`vLiqFor` varchar(15) DEFAULT '0.00' COMMENT 'Valor Líquido dos Fornecimentos .',
+				/*</deduc>*/
+				/*</cana> */		
+				CONSTRAINT fk_pedido_aquisicaodecana FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='aquisição de cana NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}	
+
+	public function criaTabelaAssinaturaDigital() {
+		try {			
+			$sqlstring = "CREATE TABLE IF NOT EXISTS `nfe_assinaturadigital` (
+				`id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key.',
+				`pedido` varchar(14) NOT NULL  DEFAULT '' COMMENT 'Número do pedido (xPed).',
+				/*<Signature> Assinatura XML da NF-e Segundo o Padrão XML Digital Signature*/	
+				`signature` varchar(70) NOT NULL  DEFAULT '' COMMENT 'Assinatura Digital.',				
+				/*</Signature> */		
+				CONSTRAINT fk_pedido_assinaturadigital FOREIGN KEY (`pedido`)
+				REFERENCES nfe_pedido(`pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+				PRIMARY KEY (`id`)		  
+				) ENGINE=InnoDB  CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Assinatura digiral da NF-e';";
+			$p_sql = Conexao::getInstance()->prepare($sqlstring);
+			$p_sql->execute();
+
+		}catch (Exception $e) {
+			print 'Ocorreu um erro ao tentar executar esta ação, por favor entre em contato com o suporte.';
+			CriaLog::Logger('Erro: Código: ' . $e->getCode() . ' Mensagem: ' . $e->getMessage()); 
+		}
+	}		
+	
+
+	public function instalarTabelas() {
+		$this->criaTabelaEmissor();	
+		$this->criaTabelaPedido();
+		$this->criaTabelaItens();
+		$this->criaTabelaTotalImpostos();
+		$this->criaTabelaTransporte();
+		$this->criaTabelaCobranca();
+		$this->criaTabelaPagamento();
+		$this->criaTabelaInformacoesAdicionais();
+		$this->criaTabelaComercioExterior();
+		$this->criaTabelaCompras();
+		$this->criaTabelaAquisicaodeCana();
+		$this->criaTabelaAssinaturaDigital();	
+	}
+
+
 }
+
+
 
 ?>
 
